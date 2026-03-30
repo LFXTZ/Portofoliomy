@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifqy Ridho Pratama - 3D Interactive Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0a14;
+            --secondary-dark: #1a1a2e;
+            --accent-primary: #a855f7;
+            --accent-light: #d946ef;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: rgba(168, 85, 247, 0.2);
+            --glow-color: rgba(168, 85, 247, 0.5);
+            --success-color: #10b981;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1a0033 50%, var(--primary-dark) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            background-attachment: fixed;
+        }
+
+        /* ===== CUSTOM CURSOR ===== */
+        .cursor-glow {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 0 0 20px var(--glow-color), inset 0 0 20px rgba(168, 85, 247, 0.3);
+            display: none;
+            transition: all 0.1s ease;
+        }
+
+        @media (min-width: 1024px) {
+            .cursor-glow {
+                display: block;
+            }
+        }
+
+        /* ===== LOADING SCREEN ===== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1a0033 50%, var(--primary-dark) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeOut 0.5s ease-in-out 3s forwards;
+        }
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(168, 85, 247, 0.2);
+            border-top: 4px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        /* ===== NAVIGATION ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 2px;
+        }
+
+        .logo-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-light);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 3rem;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-light));
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .nav-link:hover {
+            color: var(--accent-light);
+            transform: translateY(-2px);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--accent-primary);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                background: rgba(10, 10, 20, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 2rem;
+                gap: 1.5rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            margin-top: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 10%;
+            left: 5%;
+            animation: float-blob 8s ease-in-out infinite;
+            filter: blur(50px);
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(217, 70, 239, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: 5%;
+            right: 5%;
+            animation: float-blob 10s ease-in-out infinite reverse;
+            filter: blur(50px);
+        }
+
+        @keyframes float-blob {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text {
+            animation: slideInLeft 1s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hero-title {
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .highlight {
+            color: var(--accent-light);
+            text-shadow: 0 0 30px rgba(217, 70, 239, 0.5);
+            animation: pulse-text 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { text-shadow: 0 0 30px rgba(217, 70, 239, 0.5); }
+            50% { text-shadow: 0 0 60px rgba(217, 70, 239, 0.8); }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(18px, 3vw, 32px);
+            font-weight: 300;
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px var(--glow-color);
+        }
+
+        .hero-description {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border: 2px solid var(--accent-primary);
+            background: transparent;
+            color: var(--text-primary);
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-primary);
+            z-index: -1;
+            transition: left 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            color: var(--primary-dark);
+            box-shadow: 0 0 30px var(--glow-color);
+            transform: translateY(-3px);
+        }
+
+        .btn-primary:hover::before {
+            left: 0;
+        }
+
+        .btn-secondary {
+            border-color: rgba(168, 85, 247, 0.5);
+            color: var(--accent-primary);
+        }
+
+        .btn-secondary::before {
+            background: rgba(168, 85, 247, 0.2);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-light);
+            color: var(--primary-dark);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        .btn-secondary:hover::before {
+            left: 0;
+        }
+
+        /* ===== 3D CANVAS ===== */
+        .hero-3d {
+            position: relative;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: slideInRight 1s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+        }
+
+        .glow-ring {
+            position: absolute;
+            inset: 0;
+            border: 2px solid rgba(168, 85, 247, 0.3);
+            border-radius: 50%;
+            animation: pulse-ring 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse-ring {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.1; }
+        }
+
+        @media (max-width: 968px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-3d {
+                height: 350px;
+                order: -1;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* ===== SECTION STYLES ===== */
+        .section {
+            padding: 6rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section:nth-child(even) {
+            background: linear-gradient(180deg, rgba(168, 85, 247, 0.05) 0%, transparent 100%);
+        }
+
+        .section-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 800;
+            margin-bottom: 3rem;
+            text-align: center;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-light));
+            border-radius: 2px;
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        /* ===== PROFILE SECTION ===== */
+        .profile {
+            background: linear-gradient(180deg, transparent 0%, rgba(168, 85, 247, 0.03) 100%);
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .profile-card {
+            background: rgba(26, 26, 46, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.2);
+            transform: translateY(-10px);
+        }
+
+        .profile-header {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 800;
+            box-shadow: 0 0 40px var(--glow-color);
+            flex-shrink: 0;
+        }
+
+        .profile-info h3 {
+            font-size: 28px;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-status {
+            color: var(--accent-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .profile-location {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .profile-description {
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-top: 1.5rem;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .skill-card {
+            background: rgba(26, 26, 46, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .skill-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .skill-percent {
+            color: var(--accent-primary);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .skill-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-light));
+            border-radius: 4px;
+            box-shadow: 0 0 15px var(--glow-color);
+            transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 0;
+        }
+
+        @media (max-width: 968px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== RESUME SECTION ===== */
+        .resume-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .timeline-group {
+            background: rgba(26, 26, 46, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .timeline-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-primary), transparent);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2.5rem;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -36px;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            background: var(--accent-primary);
+            border: 3px solid var(--secondary-dark);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--glow-color);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-marker {
+            width: 22px;
+            height: 22px;
+            left: -39px;
+            box-shadow: 0 0 30px var(--glow-color);
+            transform: scale(1.2);
+        }
+
+        .timeline-content h4 {
+            font-size: 18px;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .timeline-meta {
+            color: var(--accent-primary);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 968px) {
+            .resume-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== PROJECTS SECTION ===== */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .project-card {
+            background: rgba(26, 26, 46, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+            animation: fadeInUp 0.6s ease-out;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
+            transform: translateY(-15px) rotateX(5deg);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(217, 70, 239, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-image::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(168, 85, 247, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .project-emoji {
+            z-index: 1;
+            filter: drop-shadow(0 0 20px var(--glow-color));
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover .project-emoji {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .project-content {
+            padding: 2rem;
+        }
+
+        .project-content h3 {
+            font-size: 22px;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .project-tech {
+            color: var(--accent-primary);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .project-tech span {
+            background: rgba(168, 85, 247, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .project-link {
+            flex: 1;
+            padding: 10px 16px;
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-link:hover {
+            background: var(--accent-primary);
+            color: var(--primary-dark);
+            box-shadow: 0 0 20px var(--glow-color);
+            transform: translateY(-2px);
+        }
+
+        /* ===== CONTACT SECTION ===== */
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .contact-form-box {
+            background: rgba(26, 26, 46, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            color: var(--accent-primary);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(224, 224, 224, 0.3);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: rgba(168, 85, 247, 0.1);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-light));
+            color: var(--primary-dark);
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-submit:hover {
+            box-shadow: 0 0 40px var(--glow-color);
+            transform: translateY(-3px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+
+        .contact-info-box {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .contact-item {
+            background: rgba(26, 26, 46, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.15);
+            transform: translateX(10px);
+        }
+
+        .contact-icon {
+            font-size: 40px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .contact-item h4 {
+            font-size: 16px;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .contact-item a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .contact-item a:hover {
+            color: var(--accent-light);
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(168, 85, 247, 0.2);
+            border: 1px solid var(--accent-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 20px;
+            text-decoration: none;
+            color: var(--accent-primary);
+        }
+
+        .social-link:hover {
+            background: var(--accent-primary);
+            color: var(--primary-dark);
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        @media (max-width: 968px) {
+            .contact-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: rgba(10, 10, 20, 0.5);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-content p {
+            margin: 0.5rem 0;
+            font-size: 14px;
+        }
+
+        .footer-heart {
+            color: var(--accent-light);
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .section {
+                padding: 4rem 1.5rem;
+            }
+
+            .nav-menu {
+                gap: 1rem;
+            }
+
+            .nav-link {
+                font-size: 12px;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+        }
+
+        /* ===== UTILITY ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        .scroll-hidden {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor-glow"></div>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span>RRP</span>
+                <span class="logo-dot"></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Beranda</a></li>
+                <li><a href="#profile" class="nav-link">Profile</a></li>
+                <li><a href="#resume" class="nav-link">Resume</a></li>
+                <li><a href="#projects" class="nav-link">Project</a></li>
+                <li><a href="#contact" class="nav-link">Kontak</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Hi, I'm <span class="highlight">Rifqy</span>
+                </h1>
+                <p class="hero-subtitle">Creative Developer & Designer</p>
+                <p class="hero-description">
+                    Saya adalah mahasiswa Sistem Informasi dengan passion dalam teknologi, UI/UX design, dan konten visual estetis. Menghadirkan inovasi dalam web development dengan sentuhan 3D modern yang elegan.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+                        Hubungi Saya
+                    </button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">
+                        Lihat Project
+                    </button>
+                </div>
+            </div>
+            <div class="hero-3d">
+                <canvas id="canvas3d"></canvas>
+                <div class="glow-ring"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROFILE SECTION -->
+    <section id="profile" class="section profile">
+        <div class="section-container">
+            <h2 class="section-title">Tentang Saya</h2>
+            <div class="profile-grid">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="avatar">RP</div>
+                        <div class="profile-info">
+                            <h3>Rifqy Ridho Pratama</h3>
+                            <p class="profile-status">Student • Information Systems</p>
+                            <p class="profile-location">📍 Cilacap, Indonesia</p>
+                        </div>
+                    </div>
+                    <p class="profile-description">
+                        Mahasiswa Sistem Informasi yang memiliki minat mendalam dalam teknologi, analisis data, dan desain digital. Bersemangat dalam membangun sistem yang efisien dan user-friendly dengan fokus pada UI/UX design, web programming, dan konten visual estetis.
+                    </p>
+                </div>
+                <div>
+                    <h3 style="font-size: 20px; margin-bottom: 2rem; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 1px;">Keahlian</h3>
+                    <div class="skills-grid">
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <span class="skill-name">UI/UX Design</span>
+                                <span class="skill-percent">90%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 0;" data-width="90"></div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <span class="skill-name">Web Development</span>
+                                <span class="skill-percent">85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 0;" data-width="85"></div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <span class="skill-name">Data Analysis</span>
+                                <span class="skill-percent">80%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 0;" data-width="80"></div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <span class="skill-name">Video Editing</span>
+                                <span class="skill-percent">88%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 0;" data-width="88"></div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <span class="skill-name">JavaScript</span>
+                                <span class="skill-percent">82%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 0;" data-width="82"></div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <span class="skill-name">3D Web Tech</span>
+                                <span class="skill-percent">75%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 0;" data-width="75"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RESUME SECTION -->
+    <section id="resume" class="section">
+        <div class="section-container">
+            <h2 class="section-title">Resume</h2>
+            <div class="resume-grid">
+                <div class="timeline-group">
+                    <h3 class="timeline-title">Pendidikan</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h4>Universitas Komputama Majenang</h4>
+                                <p class="timeline-meta">2025 - Sekarang</p>
+                                <p class="timeline-description">Program Studi Sistem Informasi</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h4>MA Minhajut Tholabah Purbalingga</h4>
+                                <p class="timeline-meta">2022 - 2025</p>
+                                <p class="timeline-description">Sekolah Menengah Atas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-group">
+                    <h3 class="timeline-title">Pengalaman</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h4>Student Information System</h4>
+                                <p class="timeline-meta">Project</p>
+                                <p class="timeline-description">Sistem manajemen data mahasiswa berbasis web dengan MySQL dan database design yang optimal.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h4>Edge Eye - YouTube Channel</h4>
+                                <p class="timeline-meta">Content Creator</p>
+                                <p class="timeline-description">Editing video lirik aesthetic hitam putih dengan teknik profesional menggunakan CapCut.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h4>HIMSI Organization</h4>
+                                <p class="timeline-meta">Anggota Aktif</p>
+                                <p class="timeline-description">Berpartisipasi dalam berbagai kegiatan organisasi mahasiswa dan pengembangan diri.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECTS SECTION -->
+    <section id="projects" class="section">
+        <div class="section-container">
+            <h2 class="section-title">Project Saya</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="project-emoji">💻</div>
+                    </div>
+                    <div class="project-content">
+                        <h3>Student Information System</h3>
+                        <div class="project-tech">
+                            <span>Web Dev</span>
+                            <span>MySQL</span>
+                            <span>Database</span>
+                        </div>
+                        <p class="project-description">
+                            Sistem manajemen data mahasiswa berbasis web dengan fitur lengkap untuk mengelola informasi akademik, database terpusat, dan reporting otomatis.
+                        </p>
+                        <div class="project-links">
+                            <a href="#" class="project-link">Demo</a>
+                            <a href="#" class="project-link">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="project-emoji">🎬</div>
+                    </div>
+                    <div class="project-content">
+                        <h3>Edge Eye - YouTube</h3>
+                        <div class="project-tech">
+                            <span>Editing</span>
+                            <span>CapCut</span>
+                            <span>Content</span>
+                        </div>
+                        <p class="project-description">
+                            Channel YouTube dengan konten video editing lirik estetis hitam putih. Menggunakan teknik editing profesional untuk menciptakan visual yang menarik dan memukau.
+                        </p>
+                        <div class="project-links">
+                            <a href="#" class="project-link">Channel</a>
+                            <a href="#" class="project-link">Portfolio</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="project-emoji">🎨</div>
+                    </div>
+                    <div class="project-content">
+                        <h3>3D Interactive Portfolio</h3>
+                        <div class="project-tech">
+                            <span>Three.js</span>
+                            <span>WebGL</span>
+                            <span>3D</span>
+                        </div>
+                        <p class="project-description">
+                            Website portofolio personal dengan desain 3D modern, glasmorphism effect, dan animasi smooth. Menampilkan karya dan pengalaman secara interaktif dan estetis.
+                        </p>
+                        <div class="project-links">
+                            <a href="#" class="project-link">Live</a>
+                            <a href="#" class="project-link">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="section">
+        <div class="section-container">
+            <h2 class="section-title">Hubungi Saya</h2>
+            <div class="contact-wrapper">
+                <div class="contact-form-box">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Nama</label>
+                            <input type="text" id="name" name="name" placeholder="Masukkan nama Anda" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="Masukkan email Anda" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Pesan</label>
+                            <textarea id="message" name="message" placeholder="Tulis pesan Anda..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit">Kirim Pesan</button>
+                    </form>
+                </div>
+
+                <div class="contact-info-box">
+                    <div class="contact-item">
+                        <div class="contact-icon">✉️</div>
+                        <div>
+                            <h4>Email</h4>
+                            <a href="mailto:rifqyridhopratama29@gmail.com">rifqyridhopratama29@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📱</div>
+                        <div>
+                            <h4>Telepon</h4>
+                            <a href="tel:+6285876184825">+62-858-7618-4825</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div>
+                            <h4>Lokasi</h4>
+                            <p>Cilacap, Central Java, Indonesia</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">🌐</div>
+                        <div>
+                            <h4>Sosial Media</h4>
+                            <div class="social-links">
+                                <a href="#" class="social-link" title="Instagram">f</a>
+                                <a href="#" class="social-link" title="LinkedIn">in</a>
+                                <a href="#" class="social-link" title="GitHub">gh</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Rifqy Ridho Pratama. All rights reserved.</p>
+            <p>Crafted with <span class="footer-heart">💜</span> and cutting-edge web technology</p>
+        </div>
+    </footer>
+
+    <!-- THREE.JS LIBRARY -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- MAIN SCRIPT -->
+    <script>
+        // ===== VARIABLES =====
+        const cursorGlow = document.querySelector('.cursor-glow');
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contactForm = document.getElementById('contactForm');
+
+        // ===== CUSTOM CURSOR =====
+        document.addEventListener('mousemove', (e) => {
+            if (cursorGlow) {
+                cursorGlow.style.left = (e.clientX - 20) + 'px';
+                cursorGlow.style.top = (e.clientY - 20) + 'px';
+            }
+        });
+
+        // ===== LOADING SCREEN =====
+        window.addEventListener('load', () => {
+            const loadingScreen = document.querySelector('.loading-screen');
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                loadingScreen.style.pointerEvents = 'none';
+            }, 3000);
+        });
+
+        // ===== MOBILE MENU =====
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // ===== SMOOTH SCROLL & ACTIVE NAV =====
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const scrollPosition = window.scrollY + 100;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+
+                navLinks.forEach(link => {
+                    link.style.color = 'var(--text-primary)';
+                    if (link.getAttribute('href') === `#${section.id}` && 
+                        scrollPosition >= sectionTop && 
+                        scrollPosition < sectionTop + sectionHeight) {
+                        link.style.color = 'var(--accent-light)';
+                        link.style.textShadow = '0 0 10px var(--glow-color)';
+                    }
+                });
+            });
+        });
+
+        // ===== 3D ROBOT WITH THREE.JS =====
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            targetX = (e.clientX / window.innerWidth) * 2 - 1;
+            targetY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                targetX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+                targetY = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+            }
+        });
+
+        // Three.js Scene Setup
+        const canvas = document.getElementById('canvas3d');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setClearColor(0x000000, 0);
+        camera.position.z = 5;
+
+        // Create 3D Robot
+        const robotGroup = new THREE.Group();
+        scene.add(robotGroup);
+
+        // Robot Body - Main cylinder
+        const bodyGeometry = new THREE.CylinderGeometry(0.8, 0.8, 2, 32);
+        const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.3 });
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.y = -0.5;
+        robotGroup.add(body);
+
+        // Robot Head
+        const headGeometry = new THREE.SphereGeometry(0.6, 32, 32);
+        const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.3 });
+        const head = new THREE.Mesh(headGeometry, headMaterial);
+        head.position.y = 1.8;
+        robotGroup.add(head);
+
+        // Left Eye
+        const eyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0xa855f7 });
+        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        leftEye.position.set(-0.2, 2.0, 0.55);
+        robotGroup.add(leftEye);
+
+        // Right Eye
+        const rightEye = leftEye.clone();
+        rightEye.position.x = 0.2;
+        robotGroup.add(rightEye);
+
+        // Left Arm
+        const armGeometry = new THREE.BoxGeometry(0.3, 1.5, 0.3);
+        const armMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.3 });
+        const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+        leftArm.position.set(-1.2, 0.5, 0);
+        robotGroup.add(leftArm);
+
+        // Right Arm
+        const rightArm = leftArm.clone();
+        rightArm.position.x = 1.2;
+        robotGroup.add(rightArm);
+
+        // Left Leg
+        const legGeometry = new THREE.BoxGeometry(0.3, 1.2, 0.3);
+        const legMaterial = new THREE.MeshStandardMaterial({ color: 0xa855f7, roughness: 0.4, metalness: 0.3 });
+        const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+        leftLeg.position.set(-0.4, -1.8, 0);
+        robotGroup.add(leftLeg);
+
+        // Right Leg
+        const rightLeg = leftLeg.clone();
+        rightLeg.position.x = 0.4;
+        robotGroup.add(rightLeg);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xa855f7, 1, 100);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        const pointLight2 = new THREE.PointLight(0xd946ef, 1, 100);
+        pointLight2.position.set(-5, -5, 5);
+        scene.add(pointLight2);
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Smooth mouse tracking
+            mouseX += (targetX - mouseX) * 0.08;
+            mouseY += (targetY - mouseY) * 0.08;
+
+            // Robot rotation based on cursor
+            robotGroup.rotation.y = mouseX * 0.5;
+            robotGroup.rotation.x = mouseY * 0.3;
+
+            // Arm animation
+            const time = Date.now() * 0.001;
+            leftArm.rotation.z = Math.sin(time) * 0.3;
+            rightArm.rotation.z = -Math.sin(time) * 0.3;
+
+            // Leg animation
+            leftLeg.rotation.x = Math.sin(time * 1.5) * 0.15;
+            rightLeg.rotation.x = -Math.sin(time * 1.5) * 0.15;
+
+            // Eyes glow pulse
+            leftEye.material.emissive.setHex(0xa855f7);
+            rightEye.material.emissive.setHex(0xa855f7);
+            leftEye.material.emissiveIntensity = 0.5 + Math.sin(time * 2) * 0.3;
+            rightEye.material.emissiveIntensity = 0.5 + Math.sin(time * 2) * 0.3;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
+
+        // ===== SKILL PROGRESS ANIMATION =====
+        function animateSkillBars() {
+            const skillCards = document.querySelectorAll('.skill-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const progressBars = entry.target.querySelectorAll('.skill-progress');
+                        progressBars.forEach(bar => {
+                            const targetWidth = bar.getAttribute('data-width');
+                            setTimeout(() => {
+                                bar.style.width = targetWidth + '%';
+                            }, 100);
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+
+            skillCards.forEach(card => observer.observe(card));
+        }
+        animateSkillBars();
+
+        // ===== SCROLL ANIMATIONS =====
+        function initScrollAnimations() {
+            const elements = document.querySelectorAll('.profile-card, .skill-card, .project-card, .timeline-item, .contact-item, .timeline-group, .contact-form-box');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            elements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                observer.observe(el);
+            });
+        }
+        initScrollAnimations();
+
+        // ===== CONTACT FORM SUBMISSION =====
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+
+            if (!name || !email || !message) {
+                alert('Mohon isi semua kolom');
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Email tidak valid');
+                return;
+            }
+
+            const mailtoLink = `mailto:rifqyridhopratama29@gmail.com?subject=Pesan dari ${encodeURIComponent(name)}&body=${encodeURIComponent(message)}\n\nDari: ${encodeURIComponent(email)}`;
+            window.location.href = mailtoLink;
+
+            contactForm.reset();
+        });
+
+        // ===== CONSOLE MESSAGE =====
+        console.log('%c🚀 Welcome to Rifqy Ridho Pratama 3D Portfolio', 'color: #a855f7; font-size: 18px; font-weight: bold;');
+        console.log('%cMove your cursor to interact with the robot! 🤖', 'color: #d946ef; font-size: 14px;');
+    </script>
+</body>
+</html>
